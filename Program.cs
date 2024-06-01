@@ -4,26 +4,55 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.SemanticKernel.Planning;
 using Microsoft.SemanticKernel.Plugins.Core;
 using System;
 using System.Net;
+using System.Net.Http;
 
-#pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning disable SKEXP0010,SKEXP0060,SKEXP0050 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-
+HttpClient client = new HttpClient();
+client.Timeout= TimeSpan.FromMinutes(2);
 
 
 var builder = Kernel.CreateBuilder()
     .AddOpenAIChatCompletion(                        // We use Semantic Kernel OpenAI API
-        modelId: "phi3",
+        modelId: "phi3:medium",
         apiKey: null,
-        endpoint: new Uri("http://localhost:11434"));// With Ollama OpenAI API endpoint
+        endpoint: new Uri("http://localhost:11434"),
+        httpClient: client);// With Ollama OpenAI API endpoint
 
 // Create the kernel
 builder.Services.AddLogging(c => c.SetMinimumLevel(LogLevel.Trace).AddDebug());
 builder.Plugins.AddFromType<AuthorEmailPlanner>();
+builder.Plugins.AddFromType<MathPlugin>();
 builder.Plugins.AddFromType<EmailPlugin>();
 Kernel kernel = builder.Build();
+
+var options = new FunctionCallingStepwisePlannerOptions
+{
+    MaxIterations = 5,
+    MaxTokens = 4000,
+};
+var planner = new FunctionCallingStepwisePlanner(options);
+
+string[] questions =
+       [
+           "What is the current hour number, plus 5?",
+            "What is 387 minus 22? Email the solution to John and Mary.",
+            "Write a limerick, translate it to Spanish, and send it to Jane",
+        ];
+
+foreach (var question in questions)
+{
+    FunctionCallingStepwisePlannerResult result = await planner.ExecuteAsync(kernel, question);
+    Console.WriteLine($"Q: {question}\nA: {result.FinalAnswer}");
+
+    // You can uncomment the line below to see the planner's process for completing the request.
+    Console.WriteLine($"Chat history:\n{System.Text.Json.JsonSerializer.Serialize(result.ChatHistory)}");
+}
+
 
 // Retrieve the chat completion service from the kernel
 IChatCompletionService chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();

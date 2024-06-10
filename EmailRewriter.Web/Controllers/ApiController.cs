@@ -44,10 +44,13 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
             1. Keep the text concise and to the point.
             2. Use shorter and more common words.
             3. Use shorter and simpler sentences.
-            3. Design for easy navigation
-            4. Use enough formatting but no more
-            5. Tell readers why they should care
-            6. Make responding easy";
+            4. Put the most important information at the top in a tl;dr";
+            //6. Include headings where applicable
+            //7. Use bullet points where applicable
+            //8. Split long paragraphs into shorter ones
+            //9. Use enough formatting but no more
+            //10. Tell readers why they should care
+            //11. Make responding easy";
 
         //var result= await _semanticKernel.InvokePromptAsync(prompt);
         IChatCompletionService chatCompletionService = _semanticKernel.GetRequiredService<IChatCompletionService>();

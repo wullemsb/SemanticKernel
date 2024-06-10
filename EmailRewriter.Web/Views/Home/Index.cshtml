@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    @using (Html.BeginForm())
+    {
+        <div class="form-group">
+            <label for="emailContent">Email Content:</label>
+            <textarea class="form-control" id="emailContent" rows="10"></textarea>
+        </div>
+        <button type="button" id="rewriteButton" class="btn btn-primary mt-3">Rewrite</button>
+        <div id="spinner" class="spinner-border text-primary" style="display: none;"></div>
+
+        <div id="result"></div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('rewriteButton').addEventListener('click', function () {
+                var emailContent = document.getElementById('emailContent').value;
+                document.getElementById('rewriteButton').disabled = true;
+                document.getElementById('spinner').style.display = 'block';
+                fetch('/api/rewrite', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 'content': emailContent })
+                })
+                .then(response => {
+                    const reader = response.body.getReader();
+                    const stream = new ReadableStream({
+                        start(controller) {
+                            function push() {
+                                reader.read().then(({done, value}) => {
+                                    if (done) {
+                                        controller.close();
+                                        document.getElementById('spinner').style.display = 'none';
+                                        document.getElementById('rewriteButton').disabled = false;
+                                        return;
+                                    }
+                                    controller.enqueue(value);
+                                    document.getElementById('result').innerHTML += new TextDecoder().decode(value);
+                                    push();
+                                })
+                            }
+                            push();
+                        }
+                    });
+                    return new Response(stream, { headers: { "Content-Type": "text/html" } });
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    document.getElementById('spinner').style.display = 'none';
+                    document.getElementById('rewriteButton').disabled = false;
+                });
+            });
+        });
+    </script>
+}

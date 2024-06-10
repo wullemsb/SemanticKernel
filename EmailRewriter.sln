@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailRewriter", "EmailRewriter.csproj", "{5768D969-9C4A-4174-ACEA-30568992B55F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailRewriter", "EmailRewiter.Console\EmailRewriter.csproj", "{E92259D9-A770-4648-B4FB-1D00D82B1689}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailRewriter.Web", "..\EmailRewriter.Web\EmailRewriter.Web.csproj", "{E27E3BE3-61C4-4B67-82E9-87B3089CE76C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailRewriter.Web", "EmailRewriter.Web\EmailRewriter.Web.csproj", "{4929069A-3836-4202-80EB-C450F59EB820}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5768D969-9C4A-4174-ACEA-30568992B55F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5768D969-9C4A-4174-ACEA-30568992B55F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5768D969-9C4A-4174-ACEA-30568992B55F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5768D969-9C4A-4174-ACEA-30568992B55F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E27E3BE3-61C4-4B67-82E9-87B3089CE76C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E27E3BE3-61C4-4B67-82E9-87B3089CE76C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E27E3BE3-61C4-4B67-82E9-87B3089CE76C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E27E3BE3-61C4-4B67-82E9-87B3089CE76C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E92259D9-A770-4648-B4FB-1D00D82B1689}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E92259D9-A770-4648-B4FB-1D00D82B1689}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E92259D9-A770-4648-B4FB-1D00D82B1689}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E92259D9-A770-4648-B4FB-1D00D82B1689}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4929069A-3836-4202-80EB-C450F59EB820}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4929069A-3836-4202-80EB-C450F59EB820}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4929069A-3836-4202-80EB-C450F59EB820}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4929069A-3836-4202-80EB-C450F59EB820}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

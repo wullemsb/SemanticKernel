@@ -18,7 +18,7 @@ client.Timeout= TimeSpan.FromMinutes(2);
 
 var builder = Kernel.CreateBuilder()
     .AddOpenAIChatCompletion(                        // We use Semantic Kernel OpenAI API
-        modelId: "phi3:medium",
+        modelId: "phi3",
         apiKey: null,
         endpoint: new Uri("http://localhost:11434"),
         httpClient: client);// With Ollama OpenAI API endpoint

@@ -24,6 +24,7 @@ var semanticKernelBuilder = Kernel.CreateBuilder()
 semanticKernelBuilder.Services.AddLogging(c => c.SetMinimumLevel(LogLevel.Trace).AddDebug());
 //semanticKernelBuilder.Plugins.AddFromType<AuthorEmailPlanner>();
 semanticKernelBuilder.Plugins.AddFromType<MathPlugin>();
+semanticKernelBuilder.Plugins.AddFromType<ConversationSummaryPlugin>();
 //semanticKernelBuilder.Plugins.AddFromType<EmailPlugin>();
 Kernel kernel = semanticKernelBuilder.Build();
 builder.Services.AddSingleton(kernel);

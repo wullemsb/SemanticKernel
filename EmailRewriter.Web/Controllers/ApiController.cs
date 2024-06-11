@@ -39,24 +39,33 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
             yield break;
         }
 
-        var prompt = @$"You are an editor-in-chief and responsible to redact a text before it is published. 
-                       When redacting you strictly apply the following rules:
+        var reward = "You get a 100$ bonus if you can keep it short.";
+
+        var prompt = $"""
+            You are an editor-in-chief and responsible to redact a text before it is published. 
+            When redacting you apply the following rules:
             1. Keep the text concise and to the point.
-            2. Use shorter and more common words.
-            3. Use shorter and simpler sentences.
-            4. Put the most important information at the top in a tl;dr";
-            //6. Include headings where applicable
-            //7. Use bullet points where applicable
-            //8. Split long paragraphs into shorter ones
-            //9. Use enough formatting but no more
-            //10. Tell readers why they should care
-            //11. Make responding easy";
+            2. Don't waste words.
+            3. Use short and common words.
+            4. Use short, clear, complete sentences. 
+
+            Bonus: {reward}
+            """;
+
+        var chatMessageContent = new ChatMessageContent(AuthorRole.System, prompt);
+        //6. Include headings where applicable
+        //7. Use bullet points where applicable
+        //8. Split long paragraphs into shorter ones
+        //9. Use enough formatting but no more
+        //10. Tell readers why they should care
+        //11. Make responding easy";
 
         //var result= await _semanticKernel.InvokePromptAsync(prompt);
+        //return result.ToString();
         IChatCompletionService chatCompletionService = _semanticKernel.GetRequiredService<IChatCompletionService>();
 
-        //return result.ToString();
-        var chatMessages = new ChatHistory(prompt);
+       
+        var chatMessages = new ChatHistory(new List<ChatMessageContent>{ chatMessageContent });
         chatMessages.AddUserMessage($"Can you edit the following content? {content}");
         //chatMessages.AddSystemMessage("Format the answer as html.");
         // Get the chat completions
@@ -69,9 +78,28 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
             executionSettings: openAIPromptExecutionSettings,
             kernel: _semanticKernel);
 
+        var message = string.Empty;
+
         await foreach (var part in result)
         {
+            message += part.Content;
             yield return part.Content;
         }
+
+        var kernelArguments = new KernelArguments()
+        {
+            {"input", message }
+        };
+
+        yield return "<br /><br />";
+
+        //https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
+        var summary = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments);
+        yield return "tl;dr "+summary;
+
+        yield return "<br /><br />";
+
+        var actions = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "GetConversationActionItems", kernelArguments);
+        yield return "Actions:" + actions;
     }
 }

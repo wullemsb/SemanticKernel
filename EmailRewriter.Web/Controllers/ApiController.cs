@@ -60,14 +60,15 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
         //10. Tell readers why they should care
         //11. Make responding easy";
 
+        //Just invoke a prompt
         //var result= await _semanticKernel.InvokePromptAsync(prompt);
         //return result.ToString();
+
         IChatCompletionService chatCompletionService = _semanticKernel.GetRequiredService<IChatCompletionService>();
 
        
         var chatMessages = new ChatHistory(new List<ChatMessageContent>{ chatMessageContent });
         chatMessages.AddUserMessage($"Can you edit the following content? {content}");
-        //chatMessages.AddSystemMessage("Format the answer as html.");
         // Get the chat completions
         OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
         {

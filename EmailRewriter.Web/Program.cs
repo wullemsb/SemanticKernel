@@ -39,16 +39,6 @@ using var loggerFactory = LoggerFactory.Create(builder =>
     builder.SetMinimumLevel(LogLevel.Trace);
 });
 
-// Create the kernel
-//semanticKernelBuilder.Services.AddLogging(c => 
-//        c.SetMinimumLevel(LogLevel.Trace)
-//        .AddOpenTelemetry(configure =>
-//        {
-//            configure.IncludeFormattedMessage = true;
-//            configure.IncludeScopes = true;
-//        })
-//        .AddDebug());
-
 semanticKernelBuilder.Services.AddSingleton(loggerFactory);
 
 using var traceProvider = Sdk.CreateTracerProviderBuilder()

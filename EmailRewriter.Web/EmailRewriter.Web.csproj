@@ -15,4 +15,8 @@
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.13.0-alpha" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EmailRewriter.ServiceDefaults\EmailRewriter.ServiceDefaults.csproj" />
+  </ItemGroup>
+
 </Project>

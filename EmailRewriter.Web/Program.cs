@@ -1,3 +1,4 @@
+using EmailRewriter.Web;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Plugins.Core;
 using OpenTelemetry;
@@ -21,7 +22,7 @@ client.Timeout = TimeSpan.FromMinutes(2);
 
 var semanticKernelBuilder = Kernel.CreateBuilder()
     .AddOpenAIChatCompletion(                        // We use Semantic Kernel OpenAI API
-        modelId: "phi3",
+        modelId: "phi3.5:latest",
         apiKey: null,
         endpoint: new Uri("http://localhost:11434"),
         httpClient: client);// With Ollama OpenAI API endpoint
@@ -52,6 +53,7 @@ using var meterProvider = Sdk.CreateMeterProviderBuilder()
     .Build();
 
 semanticKernelBuilder.Plugins.AddFromType<ConversationSummaryPlugin>();
+semanticKernelBuilder.Plugins.AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
 
 Kernel kernel = semanticKernelBuilder.Build();
 builder.Services.AddSingleton(kernel);

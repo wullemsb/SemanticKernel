@@ -1,0 +1,11 @@
+﻿name: Calculate Readability
+template_format: semantic-kernel
+description: Count the number of words, sentences and complex words in a text. Also calculate the readability of the text.
+template: | 
+    Count the number of words, sentences and complex words in a text. Also calculate the readability of the text. Text: ```{{$text}}```. 
+input_variables:
+    - name: text
+      description: The input text
+      is_required: true
+output_variable:
+    - description: "the calculated number of words, sentences, complex words and readability."

@@ -19,14 +19,47 @@
         </div>
         <button type="button" id="rewriteButton" class="btn btn-primary mt-3">Rewrite</button>
         <div id="spinner" class="spinner-border text-primary" style="display: none;"></div>
-
+        <div id="calculatedIndex"> </div>
         <div id="result"></div>
     }
 </div>
 
 @section Scripts {
     <script>
+        // Debounce function to delay the API call
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+
+        // Function to call the API and update the result div
+        async function callApiAndUpdateResult() {
+            const emailContent = document.getElementById('emailContent').value;
+            try {
+                const response = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content: emailContent })
+                });
+                const result = await response.json();
+                document.getElementById('calculatedIndex').innerText = result.index;
+            } catch (error) {
+                console.error('Error calling API:', error);
+            }
+        }
+
+        // Debounced version of the API call function
+        const debouncedCallApi = debounce(callApiAndUpdateResult, 500);
+
         document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('emailContent').addEventListener('input', debouncedCallApi);
+
             document.getElementById('rewriteButton').addEventListener('click', function () {
                 var emailContent = document.getElementById('emailContent').value;
                 document.getElementById('rewriteButton').disabled = true;

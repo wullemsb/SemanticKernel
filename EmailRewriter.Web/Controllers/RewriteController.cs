@@ -1,3 +1,4 @@
+using EmailRewriter.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Microsoft.SemanticKernel;
@@ -16,12 +17,12 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
     //    return RewriteEmailContent(model.Content);
     //}
     [HttpPost]
-    public async Task Rewrite([FromBody] EmailContentModel model)
+    public async Task Rewrite([FromBody] EmailContentModel model, CancellationToken token)
     {
         this.Response.StatusCode = 200;
         this.Response.Headers.Append(HeaderNames.ContentType, "application/octet-stream");
         var outputStream = this.Response.Body;
-        await foreach (var part in RewriteEmailContent(model.Content))
+        await foreach (var part in RewriteEmailContent(model.Content, token))
         {
            var data = new ReadOnlyMemory<byte>(System.Text.Encoding.UTF8.GetBytes(part));
 
@@ -31,8 +32,7 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
         await outputStream.FlushAsync();
     }
 
-
-    private async IAsyncEnumerable<string> RewriteEmailContent(string content)
+    private async IAsyncEnumerable<string> RewriteEmailContent(string content, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(content))
         {
@@ -72,12 +72,13 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
         // Get the chat completions
         OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
         {
-            ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
+            ToolCallBehavior = null//ToolCallBehavior.AutoInvokeKernelFunctions
         };
+
         var result=chatCompletionService.GetStreamingChatMessageContentsAsync(
             chatMessages,
             executionSettings: openAIPromptExecutionSettings,
-            kernel: _semanticKernel);
+            kernel: _semanticKernel,cancellationToken:token);
 
         var message = string.Empty;
 
@@ -95,12 +96,16 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
         yield return "<br /><br />";
 
         //https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
-        var summary = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments);
+        var readability = await _semanticKernel.InvokeAsync<double>("ReadabilityPlugin", "CalculateReadability", arguments: new() { { "body", message } },cancellationToken:token);
+        yield return "tl;dr " + readability;
+
+        //https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
+        var summary = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments, cancellationToken: token);
         yield return "tl;dr "+summary;
 
         yield return "<br /><br />";
 
-        var actions = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "GetConversationActionItems", kernelArguments);
+        var actions = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "GetConversationActionItems", kernelArguments, cancellationToken: token);
         yield return "Actions:" + actions;
     }
 }

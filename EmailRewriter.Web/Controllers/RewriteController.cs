@@ -95,9 +95,10 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
 
         yield return "<br /><br />";
 
-        //https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
         var readability = await _semanticKernel.InvokeAsync<double>("ReadabilityPlugin", "CalculateReadability", arguments: new() { { "body", message } },cancellationToken:token);
-        yield return "tl;dr " + readability;
+        yield return "readability index: " + readability;
+
+        yield return "<br /><br />";
 
         //https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
         var summary = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments, cancellationToken: token);

@@ -17,8 +17,8 @@ public class CalculateController(Kernel semanticKernel) : ControllerBase
     public async Task<CalculatedIndex> CalculateReadabilityIndex([FromBody] EmailContentModel model)
     {
         //Calculate the readability index
-        //var readabilityIndex = ReadabilityCalculator.CalculateGunningFogIndex(model.Content);
-        var readabilityIndex = await ReadabilityCalculator.CalculateGunningFogIndexThroughAI(_semanticKernel, model.Content);
+        var readabilityIndex = ReadabilityCalculator.CalculateGunningFogIndex(model.Content);
+        //var readabilityIndex = await ReadabilityCalculator.CalculateGunningFogIndexThroughAI(_semanticKernel, model.Content);
         return new CalculatedIndex(readabilityIndex);
     }
 }

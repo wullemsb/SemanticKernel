@@ -14,6 +14,8 @@
 
     I am writing to inquire, with no small degree of eagerness, whether you might grace us with your attendance at the forthcoming D&D Dive call, which has been meticulously scheduled to take place on the 11th of July, in the year of our Lord, 2024. Your participation would, of course, be regarded as an honour and would lend further distinction to this already significant occasion.
 
+    Can you confirm your presence? I would be most grateful for your prompt response, as the event is fast approaching, and we are keen to finalize the arrangements.
+
     With all best wishes for your continued success and well-being, I remain,
     Yours faithfully and with the greatest respect,
 
@@ -21,7 +23,7 @@
         </div>
         <button type="button" id="rewriteButton" class="btn btn-primary mt-3">Rewrite</button>
         <div id="spinner" class="spinner-border text-primary" style="display: none;"></div>
-        <div id="calculatedIndex"> </div>
+        <div id="calculatedIndex"></div>
         <div id="result"></div>
     }
 </div>
@@ -50,7 +52,7 @@
                     body: JSON.stringify({ content: emailContent })
                 });
                 const result = await response.json();
-                document.getElementById('calculatedIndex').innerText = result.index;
+                document.getElementById('calculatedIndex').innerHTML = "<b>Readability index:</b>"+result.index;
             } catch (error) {
                 console.error('Error calling API:', error);
             }
@@ -61,7 +63,10 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('emailContent').addEventListener('input', debouncedCallApi);
-
+            
+            //Calculate the readibility score immediately
+            callApiAndUpdateResult();
+            
             document.getElementById('rewriteButton').addEventListener('click', function () {
                 var emailContent = document.getElementById('emailContent').value;
                 document.getElementById('rewriteButton').disabled = true;

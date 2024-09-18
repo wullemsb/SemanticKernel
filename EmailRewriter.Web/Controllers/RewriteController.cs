@@ -48,6 +48,7 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
             2. Don't waste words.
             3. Use short and common words.
             4. Use short, clear, complete sentences. 
+            5. Split long paragraphs into shorter ones.
 
             Bonus: {reward}
             """;
@@ -68,7 +69,7 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
 
        
         var chatMessages = new ChatHistory(new List<ChatMessageContent>{ chatMessageContent });
-        chatMessages.AddUserMessage($"Can you edit the following content? {content}");
+        chatMessages.AddUserMessage($"Can you edit the following content to make it more readible? {content}");
         // Get the chat completions
         OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
         {
@@ -90,13 +91,13 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
 
         var kernelArguments = new KernelArguments()
         {
-            {"input", message }
+            {"input", content }
         };
 
         yield return "<br /><br />";
 
         var readability = await _semanticKernel.InvokeAsync<double>("ReadabilityPlugin", "CalculateReadability", arguments: new() { { "body", message } },cancellationToken:token);
-        yield return "readability index: " + readability;
+        yield return "<b>Readability index</b>: " + readability;
 
         yield return "<br /><br />";
 

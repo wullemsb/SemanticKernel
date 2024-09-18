@@ -6,6 +6,8 @@ using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.IO;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -42,10 +44,8 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
             yield break;
         }
 
-        var reward = "You get a 100$ bonus if you can keep it short.";
-
-        var prompt = $"""
-            You are an editor-in-chief and responsible to redact a text before it is published. 
+        var copywriter = $"""
+            You are a copywriter and responsible to redact a text before it is published. 
             When redacting you apply the following rules:
             1. Keep the text concise and to the point.
             2. Don't waste words.
@@ -53,34 +53,80 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
             4. Use short, clear, complete sentences. 
             5. Split long paragraphs into shorter ones.
 
-            Bonus: {reward}
+            Only provide a single proposal per response.
+            You're laser focused on the goal at hand.
+            Don't waste time with chit chat.
+            Consider suggestions when refining an idea.
             """;
-#pragma warning disable SKEXP0110, SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-        // Define the agent
-        ChatCompletionAgent agent =
-            new()
-            {
-                Instructions = prompt,
-                Name = "Editor",
-                Kernel = _phi35Kernel,
-                Arguments = new KernelArguments(new OpenAIPromptExecutionSettings() { ToolCallBehavior = null }),
-            };
+        string spellingCorrector = """
+   You are a spelling corrector. You review a text and correct any spelling mistakes before handing it over to a copywriter. Ensure all words are spelled correctly without altering the meaning or structure of the original text.
+""";
 
-        var chatMessageContent = new ChatMessageContent(AuthorRole.System, prompt);
-        var chatMessages = new ChatHistory(new List<ChatMessageContent>{ chatMessageContent });
-        chatMessages.AddUserMessage($"Can you edit the following content to make it more readible? {content}");
+        string reviewer = """
+    You are an art director who has opinions about copywriting born of a love for David Ogilvy.
+The goal is to determine if the given copy is acceptable to print.
+If so, state that it is approved.
+If not, provide insight on how to refine suggested copy without example.
+"""
+        ;
+
+       
+
+#pragma warning disable SKEXP0110, SKEXP0010, SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+
+        ChatCompletionAgent copywriterAgent =
+                   new()
+                   {
+                       Instructions = copywriter,
+                       Name = "CopywriterAgent",
+                       Kernel = _phi35Kernel
+                   };
+
+        ChatCompletionAgent spellingAgent =
+                   new()
+                   {
+                       Instructions = spellingCorrector,
+                       Name = "SpellingAgent",
+                       Kernel = _phi35Kernel
+                   };
+
+        ChatCompletionAgent reviewerAgent =
+                   new()
+                   {
+                       Instructions = reviewer,
+                       Name = "ReviewerAgent",
+                       Kernel = _llama31Kernel
+                   };
+
+        AgentGroupChat groupChat =
+                    new(spellingAgent,copywriterAgent, reviewerAgent) // order matters!
+                    {
+                        ExecutionSettings =
+                            new()
+                            {
+                                TerminationStrategy =
+
+                                    new ApprovalTerminationStrategy()
+                                    {
+                                        Agents = [reviewerAgent],
+                                        MaximumIterations = 3,
+                                    }                  
+                            }
+                    };
+
+        groupChat.AddChatMessage(new ChatMessageContent(AuthorRole.User,$"Can you edit the following content to fix spelling errors and make it more readible? {content}"));
 
         var message = string.Empty;
 
-        await foreach (ChatMessageContent response in agent.InvokeAsync(chatMessages))
+        await foreach (ChatMessageContent response in groupChat.InvokeAsync(cancellationToken:token))
         {
             // Print the results
-            yield return response.Content;
+            yield return $"<br /># {response.Role} - {response.AuthorName ?? "*"}: '{response.Content}'";
             
             message +=response.Content;
-            // Add the message from the agent to the chat history
-            chatMessages.Add(response);
+            //groupChat.AddChatMessage(response);
         }
 
         var kernelArguments = new KernelArguments()
@@ -88,21 +134,21 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
             {"input", content }
         };
 
-        yield return "<br /><br />";
+        //yield return "<br /><br />";
 
-        var readability = await _phi35Kernel.InvokeAsync<double>("ReadabilityPlugin", "CalculateReadability", arguments: new() { { "body", message } },cancellationToken:token);
-        yield return "<b>Readability index</b>: " + readability;
+        //var readability = await _phi35Kernel.InvokeAsync<double>("ReadabilityPlugin", "CalculateReadability", arguments: new() { { "body", message } },cancellationToken:token);
+        //yield return "<b>Readability index</b>: " + readability;
 
-        yield return "<br /><br />";
+        //yield return "<br /><br />";
 
-        //https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
-        var summary = await _phi35Kernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments, cancellationToken: token);
-        yield return "tl;dr "+summary;
+        ////https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
+        //var summary = await _phi35Kernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments, cancellationToken: token);
+        //yield return "tl;dr "+summary;
 
-        yield return "<br /><br />";
+        //yield return "<br /><br />";
 
-        var actions = await _phi35Kernel.InvokeAsync<string>("ConversationSummaryPlugin", "GetConversationActionItems", kernelArguments, cancellationToken: token);
-        yield return "Actions:" + actions;
-#pragma warning restore SKEXP0110,SKEXP0010
+        //var actions = await _phi35Kernel.InvokeAsync<string>("ConversationSummaryPlugin", "GetConversationActionItems", kernelArguments, cancellationToken: token);
+        //yield return "Actions:" + actions;
+#pragma warning restore SKEXP0110,SKEXP0010,SKEXP0001
     }
 }

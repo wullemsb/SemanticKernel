@@ -2,14 +2,17 @@ using EmailRewriter.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using System;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RewriteController(Kernel semanticKernel) : ControllerBase
+public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [FromKeyedServices("llama31")] Kernel llama31Kernel) : ControllerBase
 {
-    private readonly Kernel _semanticKernel = semanticKernel;
+    private readonly Kernel _phi35Kernel = phi35Kernel;
+    private readonly Kernel _llama31Kernel = llama31Kernel;
 
     //[HttpPost]
     //public IAsyncEnumerable<string> Rewrite([FromBody] EmailContentModel model)
@@ -52,41 +55,30 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
 
             Bonus: {reward}
             """;
+#pragma warning disable SKEXP0110, SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
+        // Define the agent
+        ChatCompletionAgent agent =
+            new()
+            {
+                Instructions = prompt,
+                Name = "Editor",
+                Kernel = _phi35Kernel,
+                Arguments = new KernelArguments(new OpenAIPromptExecutionSettings() { ToolCallBehavior = null }),
+            };
 
         var chatMessageContent = new ChatMessageContent(AuthorRole.System, prompt);
-        //6. Include headings where applicable
-        //7. Use bullet points where applicable
-        //8. Split long paragraphs into shorter ones
-        //9. Use enough formatting but no more
-        //10. Tell readers why they should care
-        //11. Make responding easy";
-
-        //Just invoke a prompt
-        //var result= await _semanticKernel.InvokePromptAsync(prompt);
-        //return result.ToString();
-
-        IChatCompletionService chatCompletionService = _semanticKernel.GetRequiredService<IChatCompletionService>();
-
-       
         var chatMessages = new ChatHistory(new List<ChatMessageContent>{ chatMessageContent });
         chatMessages.AddUserMessage($"Can you edit the following content to make it more readible? {content}");
-        // Get the chat completions
-        OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
-        {
-            ToolCallBehavior = null//ToolCallBehavior.AutoInvokeKernelFunctions
-        };
-
-        var result=chatCompletionService.GetStreamingChatMessageContentsAsync(
-            chatMessages,
-            executionSettings: openAIPromptExecutionSettings,
-            kernel: _semanticKernel,cancellationToken:token);
 
         var message = string.Empty;
 
-        await foreach (var part in result)
+        await foreach (ChatMessageContent response in agent.InvokeAsync(chatMessages))
         {
-            message += part.Content;
-            yield return part.Content;
+            // Print the results
+            message+=response.Content;
+            // Add the message from the agent to the chat history
+            chatMessages.Add(response);
         }
 
         var kernelArguments = new KernelArguments()
@@ -96,18 +88,19 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
 
         yield return "<br /><br />";
 
-        var readability = await _semanticKernel.InvokeAsync<double>("ReadabilityPlugin", "CalculateReadability", arguments: new() { { "body", message } },cancellationToken:token);
+        var readability = await _phi35Kernel.InvokeAsync<double>("ReadabilityPlugin", "CalculateReadability", arguments: new() { { "body", message } },cancellationToken:token);
         yield return "<b>Readability index</b>: " + readability;
 
         yield return "<br /><br />";
 
         //https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
-        var summary = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments, cancellationToken: token);
+        var summary = await _phi35Kernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments, cancellationToken: token);
         yield return "tl;dr "+summary;
 
         yield return "<br /><br />";
 
-        var actions = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "GetConversationActionItems", kernelArguments, cancellationToken: token);
+        var actions = await _phi35Kernel.InvokeAsync<string>("ConversationSummaryPlugin", "GetConversationActionItems", kernelArguments, cancellationToken: token);
         yield return "Actions:" + actions;
+#pragma warning restore SKEXP0110,SKEXP0010
     }
 }

@@ -7,10 +7,8 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CalculateController(Kernel semanticKernel) : ControllerBase
+public class CalculateController() : ControllerBase
 {
-    private readonly Kernel _semanticKernel = semanticKernel;
-
     public record CalculatedIndex(double Index);
 
     [HttpPost]
@@ -18,7 +16,6 @@ public class CalculateController(Kernel semanticKernel) : ControllerBase
     {
         //Calculate the readability index
         var readabilityIndex = ReadabilityCalculator.CalculateGunningFogIndex(model.Content);
-        //var readabilityIndex = await ReadabilityCalculator.CalculateGunningFogIndexThroughAI(_semanticKernel, model.Content);
         return new CalculatedIndex(readabilityIndex);
     }
 }

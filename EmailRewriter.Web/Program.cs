@@ -20,12 +20,20 @@ HttpClient client = new HttpClient();
 client.Timeout = TimeSpan.FromMinutes(2);
 
 
-var semanticKernelBuilder = Kernel.CreateBuilder()
+var phi35Builder = Kernel.CreateBuilder()
     .AddOpenAIChatCompletion(                        // We use Semantic Kernel OpenAI API
         modelId: "phi3.5:latest",
         apiKey: null,
-        endpoint: new Uri("http://localhost:11434"),
-        httpClient: client);// With Ollama OpenAI API endpoint
+        endpoint: new Uri("http://localhost:11434"));// With Ollama OpenAI API endpoint
+
+
+builder.Services.AddLogging(c => c.SetMinimumLevel(LogLevel.Trace).AddDebug());
+
+var llama31Builder = Kernel.CreateBuilder()
+    .AddOpenAIChatCompletion(                        // We use Semantic Kernel OpenAI API
+        modelId: "llama3.1:latest",
+        apiKey: null,
+        endpoint: new Uri("http://localhost:11434"));// With Ollama OpenAI API endpoint
 
 using var loggerFactory = LoggerFactory.Create(builder =>
 {
@@ -40,7 +48,8 @@ using var loggerFactory = LoggerFactory.Create(builder =>
     builder.SetMinimumLevel(LogLevel.Trace);
 });
 
-semanticKernelBuilder.Services.AddSingleton(loggerFactory);
+phi35Builder.Services.AddSingleton(loggerFactory);
+llama31Builder.Services.AddSingleton(loggerFactory);
 
 using var traceProvider = Sdk.CreateTracerProviderBuilder()
     .AddSource("Microsoft.SemanticKernel*")
@@ -52,11 +61,15 @@ using var meterProvider = Sdk.CreateMeterProviderBuilder()
     .AddOtlpExporter()
     .Build();
 
-semanticKernelBuilder.Plugins.AddFromType<ConversationSummaryPlugin>();
-semanticKernelBuilder.Plugins.AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
+phi35Builder.Plugins.AddFromType<ConversationSummaryPlugin>();
+phi35Builder.Plugins.AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
+llama31Builder.Plugins.AddFromType<ConversationSummaryPlugin>();
+llama31Builder.Plugins.AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
 
-Kernel kernel = semanticKernelBuilder.Build();
-builder.Services.AddSingleton(kernel);
+Kernel kernel = phi35Builder.Build();
+builder.Services.AddKeyedSingleton("phi35",kernel);
+builder.Services.AddKeyedSingleton("llama31",kernel);
+
 
 #pragma warning restore SKEXP0010,SKEXP0060,SKEXP0050
 

@@ -76,7 +76,9 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
         await foreach (ChatMessageContent response in agent.InvokeAsync(chatMessages))
         {
             // Print the results
-            message+=response.Content;
+            yield return response.Content;
+            
+            message +=response.Content;
             // Add the message from the agent to the chat history
             chatMessages.Add(response);
         }

@@ -20,6 +20,15 @@ HttpClient client = new HttpClient();
 client.Timeout = TimeSpan.FromMinutes(2);
 
 
+var gpt4oBuilder = Kernel.CreateBuilder()
+    .AddAzureOpenAIChatCompletion(deploymentName: "gpt-4o", endpoint: builder.Configuration["OpenAI:apiUrl"], apiKey: builder.Configuration["OpenAI:apiKey"]);
+gpt4oBuilder
+    .Plugins
+        .AddFromType<ConversationSummaryPlugin>()
+        .AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
+
+
+
 var phi35Builder = Kernel.CreateBuilder()
     .AddOpenAIChatCompletion(                        // We use Semantic Kernel OpenAI API
         modelId: "phi3.5:latest",
@@ -50,6 +59,7 @@ using var loggerFactory = LoggerFactory.Create(builder =>
 
 phi35Builder.Services.AddSingleton(loggerFactory);
 llama31Builder.Services.AddSingleton(loggerFactory);
+gpt4oBuilder.Services.AddSingleton(loggerFactory);
 
 using var traceProvider = Sdk.CreateTracerProviderBuilder()
     .AddSource("Microsoft.SemanticKernel*")
@@ -66,10 +76,9 @@ phi35Builder.Plugins.AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
 llama31Builder.Plugins.AddFromType<ConversationSummaryPlugin>();
 llama31Builder.Plugins.AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
 
-Kernel kernel = phi35Builder.Build();
-builder.Services.AddKeyedSingleton("phi35",kernel);
-builder.Services.AddKeyedSingleton("llama31",kernel);
-
+builder.Services.AddKeyedSingleton("phi35", phi35Builder.Build());
+builder.Services.AddKeyedSingleton("llama31",llama31Builder.Build());
+builder.Services.AddKeyedSingleton("gpt4o", gpt4oBuilder.Build());
 
 #pragma warning restore SKEXP0010,SKEXP0060,SKEXP0050
 

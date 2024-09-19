@@ -11,10 +11,11 @@ using System.IO;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [FromKeyedServices("llama31")] Kernel llama31Kernel) : ControllerBase
+public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [FromKeyedServices("llama31")] Kernel llama31Kernel, [FromKeyedServices("gpt4o")] Kernel gpt4oKernel) : ControllerBase
 {
     private readonly Kernel _phi35Kernel = phi35Kernel;
     private readonly Kernel _llama31Kernel = llama31Kernel;
+    private readonly Kernel _gpt4oKernel = gpt4oKernel;
 
     //[HttpPost]
     //public IAsyncEnumerable<string> Rewrite([FromBody] EmailContentModel model)
@@ -57,6 +58,8 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
             You're laser focused on the goal at hand.
             Don't waste time with chit chat.
             Consider suggestions when refining an idea.
+
+            Also calculate the readibility index of the text and provide a summary.
             """;
 
         string spellingCorrector = """
@@ -80,8 +83,9 @@ If not, provide insight on how to refine suggested copy without example.
                    new()
                    {
                        Instructions = copywriter,
-                       Name = "CopywriterAgent",
-                       Kernel = _phi35Kernel
+                       Name = "CopywriterAgent",                    
+                       Kernel = _gpt4oKernel,
+                       Arguments = new KernelArguments(new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions }),
                    };
 
         ChatCompletionAgent spellingAgent =
@@ -89,7 +93,7 @@ If not, provide insight on how to refine suggested copy without example.
                    {
                        Instructions = spellingCorrector,
                        Name = "SpellingAgent",
-                       Kernel = _phi35Kernel
+                       Kernel = _gpt4oKernel
                    };
 
         ChatCompletionAgent reviewerAgent =
@@ -97,7 +101,7 @@ If not, provide insight on how to refine suggested copy without example.
                    {
                        Instructions = reviewer,
                        Name = "ReviewerAgent",
-                       Kernel = _llama31Kernel
+                       Kernel = _gpt4oKernel
                    };
 
         AgentGroupChat groupChat =

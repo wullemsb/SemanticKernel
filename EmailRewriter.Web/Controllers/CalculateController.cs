@@ -7,10 +7,8 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CalculateController(Kernel semanticKernel) : ControllerBase
+public class CalculateController([FromKeyedServices("gpt4o")] Kernel gpt4oKernel) : ControllerBase
 {
-    private readonly Kernel _semanticKernel = semanticKernel;
-
     public record CalculatedIndex(double Index);        
     
     

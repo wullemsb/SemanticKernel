@@ -8,10 +8,20 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 using System;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.IO;
+using Microsoft.SemanticKernel.Memory;
+using System.Text;
+using Microsoft.Extensions.VectorData;
+using Microsoft.SemanticKernel.Data;
+using EmailRewriter.Web.Controllers;
+using Microsoft.SemanticKernel.Embeddings;
+using Microsoft.SemanticKernel.Connectors.Qdrant;
+using OllamaSharp.Models;
+using Qdrant.Client;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [FromKeyedServices("llama31")] Kernel llama31Kernel, [FromKeyedServices("gpt4o")] Kernel gpt4oKernel) : ControllerBase
+#pragma warning disable  SKEXP0110, SKEXP0010, SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [FromKeyedServices("llama31")] Kernel llama31Kernel, [FromKeyedServices("gpt4o")] Kernel gpt4oKernel, ITextEmbeddingGenerationService textEmbeddingGenerationService) : ControllerBase
 {
     private readonly Kernel _phi35Kernel = phi35Kernel;
     private readonly Kernel _llama31Kernel = llama31Kernel;
@@ -45,6 +55,21 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
             yield break;
         }
 
+        //var collection = new QdrantVectorStoreRecordCollection<EmailText>(new QdrantClient("localhost"), "emails");
+        //var textSearch = new VectorStoreTextSearch<EmailText>(collection,textEmbeddingGenerationService);
+
+        //// Search and return results as TextSearchResult items
+        //var query = "What is a good email intro?";
+        //KernelSearchResults<TextSearchResult> textResults = await textSearch.GetTextSearchResultsAsync(query, new() { Top = 2, Skip = 0 });
+        //Console.WriteLine("\n--- Text Search Results ---\n");
+        //await foreach (TextSearchResult result in textResults.Results)
+        //{
+        //    Console.WriteLine($"Name:  {result.Name}");
+        //    Console.WriteLine($"Value: {result.Value}");
+        //    Console.WriteLine($"Link:  {result.Link}");
+        //}
+
+
         var copywriter = $"""
             You are a copywriter and responsible to redact a text before it is published. 
             When redacting you apply the following rules:
@@ -59,7 +84,7 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
             Don't waste time with chit chat.
             Consider suggestions when refining an idea.
 
-            Also calculate the readibility index of the text and provide a summary.
+            Search for similar emails and include them as an example.
             """;
 
         string spellingCorrector = """
@@ -75,9 +100,6 @@ If not, provide insight on how to refine suggested copy without example.
         ;
 
        
-
-#pragma warning disable SKEXP0110, SKEXP0010, SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-
 
         ChatCompletionAgent copywriterAgent =
                    new()
@@ -132,27 +154,6 @@ If not, provide insight on how to refine suggested copy without example.
             message +=response.Content;
             //groupChat.AddChatMessage(response);
         }
-
-        var kernelArguments = new KernelArguments()
-        {
-            {"input", content }
-        };
-
-        //yield return "<br /><br />";
-
-        //var readability = await _phi35Kernel.InvokeAsync<double>("ReadabilityPlugin", "CalculateReadability", arguments: new() { { "body", message } },cancellationToken:token);
-        //yield return "<b>Readability index</b>: " + readability;
-
-        //yield return "<br /><br />";
-
-        ////https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
-        //var summary = await _phi35Kernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments, cancellationToken: token);
-        //yield return "tl;dr "+summary;
-
-        //yield return "<br /><br />";
-
-        //var actions = await _phi35Kernel.InvokeAsync<string>("ConversationSummaryPlugin", "GetConversationActionItems", kernelArguments, cancellationToken: token);
-        //yield return "Actions:" + actions;
 #pragma warning restore SKEXP0110,SKEXP0010,SKEXP0001
     }
 }

@@ -9,12 +9,15 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.17.2-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.17.2" />
-    <PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.17.2-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Planners.OpenAI" Version="1.17.2-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.17.2-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.17.2-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.32.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureOpenAI" Version="1.32.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.32.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.32.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Qdrant" Version="1.32.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.32.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Planners.OpenAI" Version="1.32.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.32.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.32.0-alpha" />
   </ItemGroup>
 
   <ItemGroup>

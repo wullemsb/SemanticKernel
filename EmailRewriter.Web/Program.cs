@@ -1,10 +1,17 @@
 using EmailRewriter.Web;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.Plugins.Core;
+using Microsoft.SemanticKernel.Connectors.Ollama;
+using OllamaSharp;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Microsoft.SemanticKernel.Connectors.Qdrant;
+using EmailRewriter.Web.Controllers;
+using Qdrant.Client;
+using Microsoft.SemanticKernel.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,13 +26,28 @@ builder.Services.AddControllers();
 HttpClient client = new HttpClient();
 client.Timeout = TimeSpan.FromMinutes(2);
 
+var ollamaClient = new OllamaApiClient(
+    uriString: "http://localhost:11434",    
+    defaultModel: "nomic-embed-text"
+);
+
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+ITextEmbeddingGenerationService textEmbeddingGenerationService = ollamaClient.AsTextEmbeddingGenerationService();
+
+// Build a text search plugin with vector store search and add to the kernel
+var collection = new QdrantVectorStoreRecordCollection<EmailText>(new QdrantClient("localhost"), "emails");
+var textSearch = new VectorStoreTextSearch<EmailText>(collection,textEmbeddingGenerationService);
+var searchPlugin = textSearch.CreateWithGetTextSearchResults("SearchPlugin","Returns a list of similar emails that are well written.");
+
 
 var gpt4oBuilder = Kernel.CreateBuilder()
+    .AddQdrantVectorStore("localhost")
     .AddAzureOpenAIChatCompletion(deploymentName: "gpt-4o", endpoint: builder.Configuration["OpenAI:apiUrl"], apiKey: builder.Configuration["OpenAI:apiKey"]);
 gpt4oBuilder
     .Plugins
         .AddFromType<ConversationSummaryPlugin>()
-        .AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
+        .AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin")
+        .Add(searchPlugin);
 
 
 
@@ -79,6 +101,7 @@ llama31Builder.Plugins.AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
 builder.Services.AddKeyedSingleton("phi35", phi35Builder.Build());
 builder.Services.AddKeyedSingleton("llama31",llama31Builder.Build());
 builder.Services.AddKeyedSingleton("gpt4o", gpt4oBuilder.Build());
+builder.Services.AddSingleton(textEmbeddingGenerationService);
 
 #pragma warning restore SKEXP0010,SKEXP0060,SKEXP0050
 
@@ -105,3 +128,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.Run();
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

@@ -3,7 +3,10 @@
 }
 
 <div class="row" style="margin-top: 2rem;">
-    <div class="col-12 text-end">
+    <div class="col-6">
+        <div id="calculatedIndex"> </div>
+    </div>
+    <div class="col-6 text-end">
         <button class="btn btn-primary mb-3" id="rewriteButton">
             <i class="bi bi-pencil me-2"></i>Rewrite
         </button>
@@ -11,35 +14,35 @@
 </div>
 <div class="row full-height">
     <!-- Left Column: Input Textarea -->
-  
-        <div class="col-md-6 mb-3">
-            <div class="card h-100">
-                <div class="card-header">
-                    Email content
-                </div>
-             @using (Html.BeginForm())
-             {
+
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-header">
+                Email content
+            </div>
+            @using (Html.BeginForm())
+            {
                 <div class="card-body">
                     <textarea class="form-control"
                               id="emailContent"
                               rows="15"
                               placeholder="Enter your text here...">
-Dear Esteemed Speaker,
+    Dear Esteemed Speaker,
 
-Allow me to extend a most cordial welcome to CloudBrew and the fair country of Belgium. It is my sincere hope that your sojourn among us will prove not only pleasant but also intellectually and culturally enriching.
+    Allow me to extend a most cordial welcome to CloudBrew and the fair country of Belgium. It is my sincere hope that your sojourn among us will prove not only pleasant but also intellectually and culturally enriching.
 
-We eagerly anticipate the privilege of your presence and look forward to the conversations and camaraderie that await.
+    We eagerly anticipate the privilege of your presence and look forward to the conversations and camaraderie that await.
 
-With all best wishes for your continued success and well-being, I remain,
+    With all best wishes for your continued success and well-being, I remain,
 
-Yours faithfully and with the greatest respect,
-                              </textarea>
+    Yours faithfully and with the greatest respect,
+                                  </textarea>
 
                 </div>
-             }
-            </div>
+            }
         </div>
-  
+    </div>
+
     <!-- Right Column: Output Area -->
     <div class="col-md-6 mb-3">
         <div class="card h-100">
@@ -49,7 +52,6 @@ Yours faithfully and with the greatest respect,
             <div class="card-body" id="outputArea">
                 <!-- Output will be rendered here -->
                 <div id="spinner" class="spinner-border text-primary" style="display: none;"></div>
-                <div id="calculatedIndex"> </div>
                 <div id="result"></div>
             </div>
             <div class="card-footer text-end">

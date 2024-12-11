@@ -27,11 +27,6 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
     private readonly Kernel _llama31Kernel = llama31Kernel;
     private readonly Kernel _gpt4oKernel = gpt4oKernel;
 
-    //[HttpPost]
-    //public IAsyncEnumerable<string> Rewrite([FromBody] EmailContentModel model)
-    //{
-    //    return RewriteEmailContent(model.Content);
-    //}
     [HttpPost]
     public async Task Rewrite([FromBody] EmailContentModel model, CancellationToken token)
     {
@@ -54,21 +49,6 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
         {
             yield break;
         }
-
-        //var collection = new QdrantVectorStoreRecordCollection<EmailText>(new QdrantClient("localhost"), "emails");
-        //var textSearch = new VectorStoreTextSearch<EmailText>(collection,textEmbeddingGenerationService);
-
-        //// Search and return results as TextSearchResult items
-        //var query = "What is a good email intro?";
-        //KernelSearchResults<TextSearchResult> textResults = await textSearch.GetTextSearchResultsAsync(query, new() { Top = 2, Skip = 0 });
-        //Console.WriteLine("\n--- Text Search Results ---\n");
-        //await foreach (TextSearchResult result in textResults.Results)
-        //{
-        //    Console.WriteLine($"Name:  {result.Name}");
-        //    Console.WriteLine($"Value: {result.Value}");
-        //    Console.WriteLine($"Link:  {result.Link}");
-        //}
-
 
         var copywriter = $"""
             You are a copywriter and responsible to redact a text before it is published. 

@@ -112,6 +112,7 @@ If not, provide insight on how to refine suggested copy without example.
                         ExecutionSettings =
                             new()
                             {
+                                //Remark: It is also possible to set a selection strategy
                                 TerminationStrategy =
 
                                     new ApprovalTerminationStrategy()

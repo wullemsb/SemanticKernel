@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" style="background-color: #00BFFF;">
+  <!-- Envelope -->
+  <path d="M50 100 L200 200 L350 100 L200 0 Z" fill="#FF69B4"/>
+  
+  <!-- Envelope Flap -->
+  <path d="M50 100 L200 0 L350 100" fill="#FF1493" stroke="#FFD700" stroke-width="5"/>
+  
+  <!-- Email Symbol -->
+  <text x="200" y="180" font-family="Comic Sans MS" font-size="40" fill="#FFFFFF" text-anchor="middle">
+    @
+  </text>
+  
+  <!-- Sparkly Elements -->
+  <circle cx="100" cy="50" r="10" fill="#FFD700"/>
+  <circle cx="300" cy="250" r="10" fill="#FFD700"/>
+  <path d="M50 250 L75 225 L100 250 L75 275 Z" fill="#00FFFF"/>
+  
+  <!-- Funky Border -->
+  <rect x="10" y="10" width="380" height="280" 
+        fill="none" 
+        stroke="#FFD700" 
+        stroke-width="10" 
+        stroke-dasharray="20 10"/>
+  
+  <!-- Retro Text -->
+  <text x="200" y="270" 
+        font-family="Comic Sans MS" 
+        font-size="20" 
+        fill="#FFFFFF" 
+        text-anchor="middle">
+    SURF THE INFORMATION SUPERHIGHWAY!
+  </text>
+</svg>

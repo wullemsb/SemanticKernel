@@ -1,27 +1,93 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>Welcome to the EMAIL REWRITER!</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EmailRewriter.Web</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css"
-    <link rel="stylesheet" href="~/EmailRewriter.Web.styles.css" asp-append-version="true" />
+    <style>
+        body {
+            background-color: #00BFFF;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29-32c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23FF69B4' fill-opacity='0.31' fill-rule='evenodd'/%3E%3C/svg%3E");
+            font-family: 'Comic Sans MS', cursive;
+            color: #FFFFFF;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: rgba(255, 105, 180, 0.7);
+            border: 5px solid #FFD700;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: #00FFFF;
+            text-shadow: 3px 3px 5px #FF1493;
+            font-size: 3em;
+        }
+
+        marquee {
+            background-color: #FF1493;
+            color: #00FFFF;
+            padding: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #00FFFF;
+            color: #FF1493;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+            .button:hover {
+                background-color: #FF1493;
+                color: #00FFFF;
+                transform: scale(1.1);
+            }
+
+        .under-construction {
+            text-align: center;
+            font-size: 2em;
+            color: #FFD700;
+            margin: 20px 0;
+        }
+
+        .gif-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="hero-image">
-        <img src="~/simplifier.jpeg" class="img-fluid" alt="Simplifier">
-    </div>
-    <div class="container-fluid">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <div class="container">
+        <h1>🌈 Email Rewriter 🌈</h1>
 
-    <footer class="border-top footer text-muted">
-       
-    </footer>
+        <marquee>WELCOME TO THE COOLEST EMAIL REWRITER SITE ON THE INTERNET! UNDER CONSTRUCTION!!!</marquee>
+
+        <div class="under-construction">
+            🚧 WEBSITE UNDER CONSTRUCTION 🚧
+        </div>
+
+        @RenderBody()
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="#" class="button" style="margin-left: 20px;">CONTACT ME</a>
+        </div>
+    </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

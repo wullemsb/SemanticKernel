@@ -61,10 +61,6 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
         //10. Tell readers why they should care
         //11. Make responding easy";
 
-        //Just invoke a prompt
-        //var result= await _semanticKernel.InvokePromptAsync(prompt);
-        //return result.ToString();
-
         IChatCompletionService chatCompletionService = _semanticKernel.GetRequiredService<IChatCompletionService>();
 
        
@@ -101,7 +97,6 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
 
         yield return "<br /><br />";
 
-        //https://github.com/microsoft/semantic-kernel/tree/main/dotnet/src/Plugins/Plugins.Core
         var summary = await _semanticKernel.InvokeAsync<string>("ConversationSummaryPlugin", "SummarizeConversation", kernelArguments, cancellationToken: token);
         yield return "tl;dr "+summary;
 

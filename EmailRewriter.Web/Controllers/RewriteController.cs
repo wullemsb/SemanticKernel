@@ -11,11 +11,6 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
 {
     private readonly Kernel _semanticKernel = semanticKernel;
 
-    //[HttpPost]
-    //public IAsyncEnumerable<string> Rewrite([FromBody] EmailContentModel model)
-    //{
-    //    return RewriteEmailContent(model.Content);
-    //}
     [HttpPost]
     public async Task Rewrite([FromBody] EmailContentModel model, CancellationToken token)
     {
@@ -59,10 +54,6 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
         //9. Use enough formatting but no more
         //10. Tell readers why they should care
         //11. Make responding easy";
-
-        //Just invoke a prompt
-        //var result= await _semanticKernel.InvokePromptAsync(prompt);
-        //return result.ToString();
 
         IChatCompletionService chatCompletionService = _semanticKernel.GetRequiredService<IChatCompletionService>();
 

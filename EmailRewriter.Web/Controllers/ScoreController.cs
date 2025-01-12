@@ -24,7 +24,8 @@ public class ScoreController(ITextEmbeddingGenerationService textEmbeddingGenera
         var emailText = new EmailText
         {
             Key = Guid.NewGuid(),
-            Text = model.Content
+            Tag = "CloudBrew",
+            Text = " Dear speaker, Welcome to CloudBrew and Belgium. We hope your time with us is both pleasant and enriching. We look forward to your presence and the conversations to come. Best wishes for your success and well-being. Yours faithfully and respectfully,"
         };
 
         // Create a Qdrant VectorStore object
@@ -45,6 +46,33 @@ public class ScoreController(ITextEmbeddingGenerationService textEmbeddingGenera
     [HttpPost("thumbsdown")]
     public async Task<IActionResult> ThumbsDown([FromBody] EmailContentModel model)
     {
+        // Create a Qdrant VectorStore object
+        var vectorStore = new QdrantVectorStore(new QdrantClient("localhost"));
+        var collection = vectorStore.GetCollection<Guid, EmailText>("emails");
+
+        var sampleEmail = "Hi there, welcome at CloudBrew! I hope you enjoy the conference.";
+
+        var searchVector = await textEmbeddingGenerationService.GenerateEmbeddingAsync(sampleEmail);
+
+        var filter = new VectorSearchFilter()
+               .EqualTo(nameof(EmailText.Tag), "CloudBrew");
+
+        var vectorSearchOptions = new VectorSearchOptions
+        {
+            VectorPropertyName = nameof(EmailText.TextEmbedding),
+            Filter = filter,
+            Top =2
+        };
+
+        // Do the search, passing an options object with a Top value to limit resulst to the single top match.
+        var searchResult = await collection.VectorizedSearchAsync(searchVector, vectorSearchOptions);
+
+        await foreach (var record in searchResult.Results)
+        {
+            Console.WriteLine("Email key " + record.Record.Key);
+            Console.WriteLine("Email text: " + record.Record.Text);
+        }
+
         return Ok();
     }
 }
@@ -61,6 +89,9 @@ internal class EmailText
     [VectorStoreRecordData(IsFullTextSearchable = true, StoragePropertyName = "email_text")]
     [TextSearchResultValue]
     public required string Text { get; init; }
+
+    [VectorStoreRecordData(IsFilterable = true)]
+    public required string Tag { get; init; }
 
     [VectorStoreRecordVector(768, StoragePropertyName = "email_text_embedding")]
     public ReadOnlyMemory<float> TextEmbedding { get; set; }

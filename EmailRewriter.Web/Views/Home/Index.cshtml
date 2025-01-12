@@ -123,7 +123,24 @@
                     console.error('Error:', error);
                 });
             });
-            
+
+            document.getElementById('thumbsDownButton').addEventListener('click', function () {
+                const emailContent = {
+                    content: document.getElementById('result').innerText
+                };
+
+                fetch('/api/score/thumbsdown', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(emailContent)
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+
             document.getElementById('rewriteButton').addEventListener('click', function () {
                 var emailContent = document.getElementById('emailContent').value;
                 document.getElementById('rewriteButton').disabled = true;

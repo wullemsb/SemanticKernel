@@ -22,6 +22,7 @@ Sample web app showing how to use Semantic Kernel and Ollama OpenAI integration 
 
 ### Clone the Repository
 
+Clone the repo using the following url: https://github.com/wullemsb/SemanticKernel.git 
 
 ### Configure the Ollama API
 

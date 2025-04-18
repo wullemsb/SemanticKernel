@@ -1,4 +1,3 @@
-using EmailRewriter.Web;
 using EmailRewriter.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -6,23 +5,12 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.IO;
-using Microsoft.SemanticKernel.Memory;
-using System.Text;
-using Microsoft.Extensions.VectorData;
-using Microsoft.SemanticKernel.Data;
-using EmailRewriter.Web.Controllers;
-using Microsoft.SemanticKernel.Embeddings;
-using Microsoft.SemanticKernel.Connectors.Qdrant;
-using OllamaSharp.Models;
-using Qdrant.Client;
+using System.Runtime.CompilerServices;
 
 [ApiController]
 [Route("api/[controller]")]
 #pragma warning disable  SKEXP0110, SKEXP0010, SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [FromKeyedServices("llama31")] Kernel llama31Kernel, [FromKeyedServices("gpt4o")] Kernel gpt4oKernel, ITextEmbeddingGenerationService textEmbeddingGenerationService) : ControllerBase
+public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [FromKeyedServices("llama31")] Kernel llama31Kernel, [FromKeyedServices("gpt4o")] Kernel gpt4oKernel) : ControllerBase
 {
     private readonly Kernel _phi35Kernel = phi35Kernel;
     private readonly Kernel _llama31Kernel = llama31Kernel;
@@ -80,15 +68,13 @@ If not, provide insight on how to refine suggested copy without example.
 """
         ;
 
-       
-
         ChatCompletionAgent copywriterAgent =
                    new()
                    {
                        Instructions = copywriter,
                        Name = "CopywriterAgent",                    
                        Kernel = _gpt4oKernel,
-                       Arguments = new KernelArguments(new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions }),
+                       Arguments = new KernelArguments(new OpenAIPromptExecutionSettings() { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions, ResponseFormat=typeof(EmailContentModel) }),
                    };
 
         ChatCompletionAgent spellingAgent =
@@ -126,16 +112,22 @@ If not, provide insight on how to refine suggested copy without example.
 
         groupChat.AddChatMessage(new ChatMessageContent(AuthorRole.User,$"Can you edit the following content to fix spelling errors and make it more readible? {content}"));
 
-        var message = string.Empty;
-
         await foreach (ChatMessageContent response in groupChat.InvokeAsync(cancellationToken:token))
         {
             // Print the results
             yield return $"<br /># {response.Role} - {response.AuthorName ?? "*"}: '{response.Content}'";
-            
-            message +=response.Content;
+
+            //Capture the final version from the copywriter
+            if (response.Role == AuthorRole.Assistant && response.AuthorName == "CopywriterAgent")
+            {
+                //Store 
+                RedactedEmail = System.Text.Json.JsonSerializer.Deserialize<EmailContentModel>(response.Content);
+            }
             //groupChat.AddChatMessage(response);
         }
 #pragma warning restore SKEXP0110,SKEXP0010,SKEXP0001
     }
+
+    // This is a temporary solution to store the final redacted email
+    public static EmailContentModel RedactedEmail { get; set; }
 }

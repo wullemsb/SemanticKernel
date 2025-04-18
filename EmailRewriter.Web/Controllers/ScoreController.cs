@@ -1,4 +1,5 @@
 ﻿using EmailRewriter.Web;
+using EmailRewriter.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.VectorData;
 using Microsoft.Net.Http.Headers;
@@ -15,17 +16,23 @@ namespace EmailRewriter.Web.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-public class ScoreController(ITextEmbeddingGenerationService textEmbeddingGenerationService) : ControllerBase
+public class ScoreController([FromKeyedServices("phi35")] Kernel phi35Kernel, ITextEmbeddingGenerationService textEmbeddingGenerationService) : ControllerBase
 #pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 {
     [HttpPost("thumbsup")]
-    public async Task<IActionResult> ThumbsUp([FromBody] EmailContentModel model)
+    public async Task<IActionResult> ThumbsUp()
     {
+        var redactedEmail = RewriteController.RedactedEmail;
+        if (redactedEmail == null)
+            return Ok();
+
+        var tags = await TagExtractor.ExtractTags(phi35Kernel, redactedEmail.Content);
+
         var emailText = new EmailText
         {
             Key = Guid.NewGuid(),
-            Tag = "CloudBrew",
-            Text = " Dear speaker, Welcome to CloudBrew and Belgium. We hope your time with us is both pleasant and enriching. We look forward to your presence and the conversations to come. Best wishes for your success and well-being. Yours faithfully and respectfully,"
+            Tags = new (tags),
+            Text = redactedEmail.Content
         };
 
         // Create a Qdrant VectorStore object
@@ -54,13 +61,9 @@ public class ScoreController(ITextEmbeddingGenerationService textEmbeddingGenera
 
         var searchVector = await textEmbeddingGenerationService.GenerateEmbeddingAsync(sampleEmail);
 
-        var filter = new VectorSearchFilter()
-               .EqualTo(nameof(EmailText.Tag), "CloudBrew");
-
-        var vectorSearchOptions = new VectorSearchOptions
+        var vectorSearchOptions = new VectorSearchOptions<EmailText>
         {
-            VectorPropertyName = nameof(EmailText.TextEmbedding),
-            Filter = filter,
+            Filter = email => email.Tags.Contains("CloudBrew"),
             Top =2
         };
 
@@ -90,8 +93,9 @@ internal class EmailText
     [TextSearchResultValue]
     public required string Text { get; init; }
 
+    // Tags is marked as filterable, since we want to filter using this property.
     [VectorStoreRecordData(IsFilterable = true)]
-    public required string Tag { get; init; }
+    public List<string> Tags { get; set; }
 
     [VectorStoreRecordVector(768, StoragePropertyName = "email_text_embedding")]
     public ReadOnlyMemory<float> TextEmbedding { get; set; }

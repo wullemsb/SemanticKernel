@@ -1,8 +1,11 @@
+#pragma warning disable SKEXP0050, SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
 using EmailRewriter.Web;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.Plugins.Core;
 using Microsoft.SemanticKernel.Connectors.Ollama;
+using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 using OllamaSharp;
 using OpenTelemetry;
 using OpenTelemetry.Logs;
@@ -53,9 +56,7 @@ gpt4oBuilder
 var phi35Builder = Kernel.CreateBuilder()
     .AddOllamaChatCompletion(                        
         modelId: "phi3.5:latest",
-        apiKey: null,
         endpoint: new Uri("http://localhost:11434"));// With Ollama OpenAI API endpoint
-
 
 builder.Services.AddLogging(c => c.SetMinimumLevel(LogLevel.Trace).AddDebug());
 
@@ -125,4 +126,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.Run();
-#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+#pragma warning restore SKEXP0050, SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

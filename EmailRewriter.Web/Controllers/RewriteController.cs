@@ -1,9 +1,11 @@
 using EmailRewriter.Web;
+using EmailRewriter.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using System.Runtime.CompilerServices;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -32,7 +34,7 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
         await outputStream.FlushAsync();
     }
 
-    private async IAsyncEnumerable<string> RewriteEmailContent(string content, CancellationToken token)
+    private async IAsyncEnumerable<string> RewriteEmailContent(string content, [EnumeratorCancellation] CancellationToken token=default)
     {
         if (string.IsNullOrWhiteSpace(content))
         {
@@ -54,12 +56,6 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
             """;
 
         var chatMessageContent = new ChatMessageContent(AuthorRole.System, prompt);
-        //6. Include headings where applicable
-        //7. Use bullet points where applicable
-        //8. Split long paragraphs into shorter ones
-        //9. Use enough formatting but no more
-        //10. Tell readers why they should care
-        //11. Make responding easy";
 
         IChatCompletionService chatCompletionService = _semanticKernel.GetRequiredService<IChatCompletionService>();
 
@@ -69,13 +65,14 @@ public class RewriteController(Kernel semanticKernel) : ControllerBase
         // Get the chat completions
         OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
         {
-            ToolCallBehavior = null//ToolCallBehavior.AutoInvokeKernelFunctions
+            ToolCallBehavior = null
         };
 
-        var result=chatCompletionService.GetStreamingChatMessageContentsAsync(
+        var result = chatCompletionService.GetStreamingChatMessageContentsAsync(
             chatMessages,
             executionSettings: openAIPromptExecutionSettings,
-            kernel: _semanticKernel,cancellationToken:token);
+            kernel: _semanticKernel,
+            cancellationToken: token);
 
         var message = string.Empty;
 

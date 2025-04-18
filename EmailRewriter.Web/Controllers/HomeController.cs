@@ -15,7 +15,10 @@ namespace EmailRewriter.Web.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "emailexample.txt");
+            var emailContent = System.IO.File.ReadAllText(filePath);
+            
+            return View(new EmailContentModel { Content = emailContent });
         }
 
         public IActionResult Privacy()

@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.SemanticKernel.Planners.OpenAI" Version="1.47.0-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.47.0-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.47.0-alpha" />
+    <PackageReference Include="ModelContextProtocol-SemanticKernel" Version="0.0.1-preview-09" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 

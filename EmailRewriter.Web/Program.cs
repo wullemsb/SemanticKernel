@@ -42,6 +42,7 @@ var textSearch = new VectorStoreTextSearch<EmailText>(collection,textEmbeddingGe
 var searchPlugin = textSearch.CreateWithGetTextSearchResults("SearchPlugin","Returns a list of similar emails that are well written.");
 
 
+
 var gpt4oBuilder = Kernel.CreateBuilder()
     .AddQdrantVectorStore("localhost")
     .AddAzureOpenAIChatCompletion(deploymentName: "gpt-4o", endpoint: builder.Configuration["OpenAI:apiUrl"], apiKey: builder.Configuration["OpenAI:apiKey"]);
@@ -50,8 +51,6 @@ gpt4oBuilder
         .AddFromType<ConversationSummaryPlugin>()
         .AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin")
         .Add(searchPlugin);
-
-
 
 var phi35Builder = Kernel.CreateBuilder()
     .AddOllamaChatCompletion(                        

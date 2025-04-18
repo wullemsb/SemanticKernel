@@ -115,7 +115,7 @@ If not, provide insight on how to refine suggested copy without example.
         await foreach (ChatMessageContent response in groupChat.InvokeAsync(cancellationToken:token))
         {
             // Print the results
-            yield return $"<br /># {response.Role} - {response.AuthorName ?? "*"}: '{response.Content}'";
+            yield return $"<br /># <b>{response.Role} - {response.AuthorName ?? "*"}</b>:<br /> '{response.Content}'";
 
             //Capture the final version from the copywriter
             if (response.Role == AuthorRole.Assistant && response.AuthorName == "CopywriterAgent")

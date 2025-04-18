@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outlook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: #f3f2f1;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .search-container {
+            flex-grow: 1;
+            max-width: 600px;
+            margin-right: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .icon {
+            color: #605e5c;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #0078d4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .toolbar {
+            background-color: #f3f2f1;
+            padding: 5px;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .toolbar-section {
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            border-right: 1px solid #e1dfdd;
+        }
+
+        .toolbar-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 10px;
+            font-size: 12px;
+            color: #323130;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+            .toolbar-btn:hover {
+                background-color: #e1dfdd;
+                border-radius: 2px;
+            }
+
+        .btn-primary {
+            color: white;
+            background-color: #0078d4;
+            border-radius: 2px;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+            .btn-primary:hover {
+                background-color: #106ebe;
+            }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 90px);
+        }
+
+        .sidebar {
+            width: 200px;
+            background-color: #f3f2f1;
+            overflow-y: auto;
+            border-right: 1px solid #e1dfdd;
+        }
+
+        .folder-section {
+            margin-bottom: 10px;
+        }
+
+        .folder-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .folder-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px 6px 30px;
+            cursor: pointer;
+        }
+
+            .folder-item:hover {
+                background-color: #e1dfdd;
+            }
+
+        .folder-active {
+            background-color: #c7e0f4;
+        }
+
+        .folder-count {
+            margin-left: auto;
+            font-size: 12px;
+            color: #605e5c;
+        }
+
+        .email-list {
+            width: 350px;
+            border-right: 1px solid #e1dfdd;
+            overflow-y: auto;
+        }
+
+        .list-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .list-title {
+            font-weight: 600;
+            flex-grow: 1;
+        }
+
+        .list-tools {
+            display: flex;
+            gap: 10px;
+        }
+
+        .date-header {
+            padding: 6px 12px;
+            font-weight: 600;
+            font-size: 12px;
+            background-color: #f9f8f7;
+        }
+
+        .email-item {
+            display: flex;
+            padding: 12px;
+            border-bottom: 1px solid #f3f2f1;
+            cursor: pointer;
+            position: relative;
+        }
+
+            .email-item:hover {
+                background-color: #f9f8f7;
+            }
+
+        .sender-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #8764b8;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .email-content {
+            flex-grow: 1;
+        }
+
+        .email-sender {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .email-subject {
+            font-weight: 600;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-preview {
+            color: #605e5c;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-time {
+            font-size: 12px;
+            color: #605e5c;
+            white-space: nowrap;
+            padding-left: 10px;
+        }
+
+        .content-pane {
+            flex-grow: 1;
+            background-color: white;
+            overflow-y: auto;
+        }
+
+        .email-view-header {
+            padding: 15px;
+            border-bottom: 1px solid #e1dfdd;
+        }
+
+        .email-view-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .email-view-summary {
+            background-color: #f9f8f7;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-logo {
+            margin-right: 10px;
+        }
+
+        .email-view-from {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .from-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0ba00;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .from-details {
+            flex-grow: 1;
+        }
+
+        .email-address {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .email-to {
+            margin-bottom: 5px;
+        }
+
+        .warning-box {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #c8c6c4;
+        }
+
+        .email-body {
+            padding: 15px;
+        }
+
+        .caret {
+            margin-right: 5px;
+        }
+
+        /* Specific colors for avatars */
+        .avatar-ep {
+            background-color: #107c41;
+        }
+
+        .avatar-s {
+            background-color: #8764b8;
+        }
+
+        .avatar-l {
+            background-color: #0078d4;
+        }
+
+        .avatar-f {
+            background-color: #d13438;
+        }
+
+        .avatar-np {
+            background-color: #ca5010;
+        }
+
+        .avatar-dg {
+            background-color: #8378de;
+        }
+
+        .avatar-i {
+            background-color: #038387;
+        }
+
+        .avatar-sy {
+            background-color: #c239b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <span>Outlook</span>
+        </div>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Zoeken">
+        </div>
+        <div class="header-icons">
+            <div class="icon">📃</div>
+            <div class="icon">📷</div>
+            <div class="icon">📄</div>
+            <div class="icon"><span style="color: red;">1</span>📩</div>
+            <div class="icon">⚙️</div>
+            <div class="user-avatar">WB</div>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-section">
+            <button class="toolbar-btn">Start</button>
+            <button class="toolbar-btn">Weergeven</button>
+            <button class="toolbar-btn">Help</button>
+        </div>
+
+        <div class="toolbar-section">
+            <button class="btn-primary">Nieuwe e-mail</button>
+            <button class="toolbar-btn">Verwijderen</button>
+            <button class="toolbar-btn">Archiveren</button>
+            <button class="toolbar-btn">Rapporteren</button>
+            <button class="toolbar-btn">Opruimen</button>
+            <button class="toolbar-btn">Verplaatsen naar</button>
+        </div>
+
+        <div class="toolbar-section">
+            <button class="toolbar-btn">Snelle stappen</button>
+            <button class="toolbar-btn">Gelezen/ongelezen</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="folder-section">
+                <div class="folder-header">
+                    <span class="caret">▼</span> Favorieten
+                </div>
+                <div class="folder-item">
+                    <span>📤</span>&nbsp; Verzonden items
+                    <span class="folder-count">5</span>
+                </div>
+                <div class="folder-item">
+                    <span>📄</span>&nbsp; Concepten
+                    <span class="folder-count">54</span>
+                </div>
+            </div>
+
+            <div class="folder-section">
+                <div class="folder-header">
+                    <span class="caret">▼</span> Mappen
+                </div>
+                <div class="folder-item folder-active">
+                    <span>📥</span>&nbsp; Postvak IN
+                    <span class="folder-count">3385</span>
+                </div>
+                <div class="folder-item">
+                    <span>📝</span>&nbsp; ToBlog
+                    <span class="folder-count">1238</span>
+                </div>
+                <div class="folder-item">
+                    <span>📖</span>&nbsp; ToRead
+                    <span class="folder-count">5</span>
+                </div>
+                <div class="folder-item">
+                    <span>📄</span>&nbsp; Concepten
+                    <span class="folder-count">54</span>
+                </div>
+                <div class="folder-item">
+                    <span>📤</span>&nbsp; Verzonden items
+                    <span class="folder-count">5</span>
+                </div>
+                <div class="folder-item">
+                    <span>🗑️</span>&nbsp; Verwijderde items
+                    <span class="folder-count">460</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email List -->
+        <div class="email-list">
+            <div class="list-header">
+                <div class="list-title">Postvak IN</div>
+                <div class="list-tools">
+                    <span>📌</span>
+                </div>
+            </div>
+
+            <div class="date-header">Vandaag</div>
+
+            <div class="email-item">
+                <div class="checkbox" style="margin-right: 8px;">☐</div>
+                <div class="email-content">
+                    <div class="email-sender">john.doe@company.com</div>
+                    <div class="email-subject">Code & Comedy</div>
+                    <div class="email-preview">
+                        Dear Esteemed Colleague, I hope this message finds ...
+                    </div>
+                </div>
+                <div class="email-time">09:30</div>
+            </div>
+
+            <div class="email-item">
+                <div class="checkbox" style="margin-right: 8px;">☐</div>
+                <div class="email-content">
+                    <div class="email-sender">john.doe@company.com</div>
+                    <div class="email-subject">Project Update: Q2 Goals</div>
+                    <div class="email-preview">Hi Team, Please find attached the latest update on...</div>
+                </div>
+                <div class="email-time">09:15</div>
+            </div>
+
+            <div class="email-item">
+                <div class="sender-avatar avatar-l">L</div>
+                <div class="email-content">
+                    <div class="email-sender">Linda Carter</div>
+                    <div class="email-subject">Reminder: Team Meeting at 3 PM</div>
+                    <div class="email-preview">Don't forget about our team meeting scheduled for...</div>
+                </div>
+                <div class="email-time">08:45</div>
+            </div>
+
+            <div class="email-item">
+                <div class="sender-avatar avatar-f">F</div>
+                <div class="email-content">
+                    <div class="email-sender">Finance Department</div>
+                    <div class="email-subject">Invoice Due: Payment Reminder</div>
+                    <div class="email-preview">Dear Customer, This is a friendly reminder that...</div>
+                </div>
+                <div class="email-time">08:30</div>
+            </div>
+
+            <div class="email-item">
+                <div class="sender-avatar avatar-np">NP</div>
+                <div class="email-content">
+                    <div class="email-sender">Nina Patel</div>
+                    <div class="email-subject">Follow-Up: Marketing Campaign</div>
+                    <div class="email-preview">Hi, Just checking in to see if you had a chance to...</div>
+                </div>
+                <div class="email-time">08:00</div>
+            </div>
+
+            <div class="email-item">
+                <div class="sender-avatar avatar-s">S</div>
+                <div class="email-content">
+                    <div class="email-sender">Support Team</div>
+                    <div class="email-subject">Ticket #12345 Resolved</div>
+                    <div class="email-preview">Hello, Your support ticket has been successfully...</div>
+                </div>
+                <div class="email-time">07:45</div>
+            </div>
+        </div>
+
+
+        <!-- Content Pane -->
+        <div class="content-pane">
+            <div class="email-view-header">
+                <div class="email-view-title">Code & Comedy</div>
+
+                <div class="email-view-summary">
+                    <div class="summary-logo">👤</div>
+                    <div>Samenvatting door Copilot</div>
+                    <div style="margin-left: auto;">❌</div>
+                </div>
+
+                <div class="email-view-from">
+                    <div class="from-avatar">Q</div>
+                    <div class="from-details">
+                        <div class="email-address">john.doe@company.com</div>
+                        <div class="email-to">Aan: bart.wullems@soprasteria.com</div>
+                        <div>Vr 2025-04-18 15:53</div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <span>😊</span>
+                        <span>↩️</span>
+                        <span>⏪</span>
+                        <span>⏩</span>
+                        <span>📅</span>
+                        <span>⋮</span>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <span>⚠️</span> Sommige inhoud in dit bericht is geblokkeerd omdat de afzender niet in de lijst met veilige afzenders voorkomt.
+                    <div style="margin-top: 10px; display: flex; gap: 10px;">
+                        <button>Afzender vertrouwen</button>
+                        <button>Geblokkeerde inhoud weergeven</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <span>🌐</span> Dit bericht is in het Engels
+                    <div style="margin-left: auto; display: flex; gap: 10px;">
+                        <button>Vertalen naar het Nederlands</button>
+                        <button>Nooit vanuit het Engels</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="email-body">
+                <p>
+                    Dear Esteemed Colleague,<br />
+                    <br />
+                    I hope this message finds you in the highest spirits and excellent health. I am writing to cordially inquire about your plans<br />
+                    concerning the upcoming gathering that has piqued the interest of many within our professional community—the Code & Comedy Conference.<br />
+                    <br />
+                    This unique event promises to amalgamate the enlightening world of computer programming with the invigorating charm of humor, offering a <br />
+                    platform for like-minded individuals to share knowledge, engage in thought-provoking discussions, and enjoy a respite from our often too-serious endeavors.<br />
+                    <br />
+                    Your presence at such a confluence of intellectual and jovial exchange would undoubtedly enrich the experience for all involved. May I presume that you are considering<br />
+                    gracing this conference with your attendance? It would be a pleasure to partake in the sessions alongside a scholar of your caliber.<br />
+                    <br />
+                    Please do inform me of your intentions at your earliest covnecience, as I eagerly anticipate the possibility of our collaborative parcipitation.
+                    <br />
+                    <br />
+                    Warm regards,
+                    <br />
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

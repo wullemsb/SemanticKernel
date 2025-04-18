@@ -15,10 +15,7 @@ public class HomeController : Controller
 
         public IActionResult Index()
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "emailexample.txt");
-            var emailContent = System.IO.File.ReadAllText(filePath);
-            
-            return View(new EmailContentModel { Content = emailContent });
+            return View(new EmailContentModel { Content = string.Empty });
         }
 
     public IActionResult Privacy()

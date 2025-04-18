@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailRewriter.AppHost", "Em
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailRewriter.ServiceDefaults", "EmailRewriter.ServiceDefaults\EmailRewriter.ServiceDefaults.csproj", "{FAA4B6D3-B910-4796-B0CC-AF8AA30C9151}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutlookClone", "OutlookClone\OutlookClone.csproj", "{ACDDB622-6ECD-4B1B-90B2-B420BBEA7928}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{FAA4B6D3-B910-4796-B0CC-AF8AA30C9151}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAA4B6D3-B910-4796-B0CC-AF8AA30C9151}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAA4B6D3-B910-4796-B0CC-AF8AA30C9151}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACDDB622-6ECD-4B1B-90B2-B420BBEA7928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACDDB622-6ECD-4B1B-90B2-B420BBEA7928}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACDDB622-6ECD-4B1B-90B2-B420BBEA7928}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACDDB622-6ECD-4B1B-90B2-B420BBEA7928}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

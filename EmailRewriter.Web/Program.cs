@@ -14,18 +14,17 @@ builder.AddServiceDefaults();
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 
-#pragma warning disable SKEXP0010,SKEXP0060,SKEXP0050
-
 HttpClient client = new HttpClient();
+client.BaseAddress = new Uri("http://localhost:11434");
 client.Timeout = TimeSpan.FromMinutes(2);
 
 
+#pragma warning disable SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 var semanticKernelBuilder = Kernel.CreateBuilder()
-    .AddOpenAIChatCompletion(                        // We use Semantic Kernel OpenAI API
+    .AddOllamaChatCompletion(                        
         modelId: "phi3.5:latest",
-        apiKey: null,
-        endpoint: new Uri("http://localhost:11434"),
         httpClient: client);// With Ollama OpenAI API endpoint
+#pragma warning restore SKEXP0070 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 using var loggerFactory = LoggerFactory.Create(builder =>
 {
@@ -52,13 +51,13 @@ using var meterProvider = Sdk.CreateMeterProviderBuilder()
     .AddOtlpExporter()
     .Build();
 
+#pragma warning disable SKEXP0050 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 semanticKernelBuilder.Plugins.AddFromType<ConversationSummaryPlugin>();
+#pragma warning restore SKEXP0050 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 semanticKernelBuilder.Plugins.AddFromType<EmailReadabilityPlugin>("ReadabilityPlugin");
 
 Kernel kernel = semanticKernelBuilder.Build();
 builder.Services.AddSingleton(kernel);
-
-#pragma warning restore SKEXP0010,SKEXP0060,SKEXP0050
 
 var app = builder.Build();
 

@@ -21,9 +21,8 @@ builder.AddServiceDefaults();
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 
-#pragma warning disable SKEXP0010,SKEXP0060,SKEXP0050
-
 HttpClient client = new HttpClient();
+client.BaseAddress = new Uri("http://localhost:11434");
 client.Timeout = TimeSpan.FromMinutes(2);
 
 var ollamaClient = new OllamaApiClient(
@@ -52,7 +51,7 @@ gpt4oBuilder
 
 
 var phi35Builder = Kernel.CreateBuilder()
-    .AddOpenAIChatCompletion(                        // We use Semantic Kernel OpenAI API
+    .AddOllamaChatCompletion(                        
         modelId: "phi3.5:latest",
         apiKey: null,
         endpoint: new Uri("http://localhost:11434"));// With Ollama OpenAI API endpoint
@@ -102,8 +101,6 @@ builder.Services.AddKeyedSingleton("phi35", phi35Builder.Build());
 builder.Services.AddKeyedSingleton("llama31",llama31Builder.Build());
 builder.Services.AddKeyedSingleton("gpt4o", gpt4oBuilder.Build());
 builder.Services.AddSingleton(textEmbeddingGenerationService);
-
-#pragma warning restore SKEXP0010,SKEXP0060,SKEXP0050
 
 var app = builder.Build();
 

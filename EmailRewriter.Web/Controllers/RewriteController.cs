@@ -1,4 +1,5 @@
 using EmailRewriter.Web;
+using EmailRewriter.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Microsoft.SemanticKernel;
@@ -43,7 +44,7 @@ public class RewriteController([FromKeyedServices("phi35")]Kernel phi35Kernel, [
         await outputStream.FlushAsync();
     }
 
-    private async IAsyncEnumerable<string> RewriteEmailContent(string content, CancellationToken token)
+    private async IAsyncEnumerable<string> RewriteEmailContent(string content, [EnumeratorCancellation] CancellationToken token=default)
     {
         if (string.IsNullOrWhiteSpace(content))
         {

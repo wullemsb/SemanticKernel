@@ -1,4 +1,5 @@
 using EmailRewriter.Web;
+using EmailRewriter.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Microsoft.SemanticKernel;
